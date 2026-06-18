@@ -253,7 +253,8 @@ CRITICAL RULES:
 
         findings = filterFalsePositives(sanitizedFindings);
         success = true;
-
+        console.log(`SELECT * FROM repositories;`)
+        console.log(process.env.GROQ_API_KEY)
       } catch (error: any) {
         if (error.status === 429) {
           const retryAfterHeader = error.headers?.get?.('retry-after') || error.headers?.['retry-after'];
