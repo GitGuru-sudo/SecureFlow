@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
 
       await Promise.all(repoPromises);
       console.log(`Successfully installed app and populated ${repositories.length} repositories.`);
-      console.log(process.env.GROQ_API_KEY)
+
       // --- EVENT 1: Repository Added (Installation) ---
       await prisma.auditLog.create({
         data: {
