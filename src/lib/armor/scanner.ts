@@ -124,9 +124,13 @@ export class ArmorIQScanner {
         continue;
       }
 
-      const addedLines = extractAddedLines(file.patch || '');
+      if (!file.patch || file.patch.trim() === '') {
+        continue;
+      }
+
+      const addedLines = extractAddedLines(file.patch);
       
-      if (!addedLines.trim()) {
+      if (!addedLines || addedLines.trim().length === 0) {
         continue;
       }
 
