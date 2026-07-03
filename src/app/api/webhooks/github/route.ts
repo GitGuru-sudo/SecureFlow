@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+
 import { createHmac, timingSafeEqual } from 'crypto';
 import { scanner } from '@/lib/armor/scanner';
 import { iq } from '@/lib/armor/iq';
@@ -51,7 +53,47 @@ async function verifyGitHubWebhook(req: NextRequest): Promise<any> {
 export async function POST(req: NextRequest) {
 
   try {
-    const payload = await verifyGitHubWebhook(req);
+    const rawPayload = await verifyGitHubWebhook(req);
+    
+    // Strict input validation schema
+    const repoSchema = z.object({
+      id: z.union([z.number(), z.string()]),
+      full_name: z.string(),
+      name: z.string().optional(),
+      owner: z.object({
+        login: z.string()
+      }).passthrough().optional()
+    }).passthrough();
+
+    const payloadSchema = z.object({
+      action: z.string().optional(),
+      pull_request: z.object({
+        id: z.union([z.number(), z.string()]),
+        number: z.number(),
+        title: z.string().optional(),
+        state: z.string().optional(),
+        head: z.object({
+          sha: z.string()
+        }).passthrough().optional()
+      }).passthrough().optional(),
+      repository: repoSchema.optional(),
+      installation: z.object({
+        id: z.union([z.number(), z.string()])
+      }).passthrough().optional(),
+      repositories: z.array(repoSchema).optional(),
+      repositories_added: z.array(repoSchema).optional(),
+      sender: z.object({
+        id: z.union([z.number(), z.string()])
+      }).passthrough().optional()
+    }).passthrough();
+
+    const parsed = payloadSchema.safeParse(rawPayload);
+    if (!parsed.success) {
+      console.error('Invalid webhook payload structure:', parsed.error.format());
+      return NextResponse.json({ error: 'Invalid payload structure' }, { status: 400 });
+    }
+    const payload = parsed.data;
+
     const event = req.headers.get('x-github-event');
 
 
