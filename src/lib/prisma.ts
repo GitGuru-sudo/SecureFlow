@@ -2,6 +2,12 @@ import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 
+if (typeof (BigInt.prototype as any).toJSON === 'undefined') {
+  (BigInt.prototype as any).toJSON = function () {
+    return this.toString();
+  };
+}
+
 const prismaClientSingleton = () => {
   // 1. Initialize a connection pool using the standard pg driver
   const connectionString = process.env.DATABASE_URL;
