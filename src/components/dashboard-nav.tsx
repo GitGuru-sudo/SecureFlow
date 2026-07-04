@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import {
   LayoutDashboard,
   ShieldAlert,
