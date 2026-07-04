@@ -158,7 +158,8 @@ export class ArmorIQScanner {
         fileContext = "THIS IS A SMART CONTRACT OR PRIVACY-PRESERVING ZERO-KNOWLEDGE CIRCUIT. Analyze it with decentralized architecture patterns in mind and reduce false positives for decentralized logic.";
       }
 
-      const fileContentChunk = `<file name="${file.filename}" context_warning="${fileContext}">\n${addedLines}\n</file>\n\n`;
+      const sanitizedLines = addedLines.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const fileContentChunk = `<file name="${file.filename}" context_warning="${fileContext}">\n${sanitizedLines}\n</file>\n\n`;
 
       if (currentBatch.length + fileContentChunk.length > MAX_COMBINED_LENGTH && currentBatch.length > 0) {
         const batchFindings = await processBatch(currentBatch, currentBatchFiles);
