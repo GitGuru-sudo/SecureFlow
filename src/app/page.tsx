@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Shield, Lock, Github, ArrowRight, CheckCircle, Search, Cpu, ChevronDown, GitPullRequest, ScanSearch, GitMerge } from 'lucide-react';
 import Image from 'next/image';
 import { LoginButton } from '@/components/ui/login-button';
-
+import { ThemeToggle } from '@/components/theme-toggle';
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -22,7 +22,12 @@ export default function LandingPage() {
           </div>
           <span className="font-headline font-bold text-xl tracking-tight">SecureFlow</span>
         </div>
+
+        <div className="flex items-center gap-4">
+          <ThemeToggle />
+
         <div className="flex items-center gap-2 sm:gap-4">
+
           <LoginButton />
           <Link href={process.env.GITHUB_APP_URL!}>
             <Button className="bg-primary text-background hover:bg-primary/90 glow-primary">
@@ -244,4 +249,9 @@ function FeatureCard({ icon, title, description }: { icon: React.ReactNode, titl
       </p>
     </div>
   );
+
 }
+
+
+}
+

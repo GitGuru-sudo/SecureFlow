@@ -5,6 +5,42 @@
 
 @layer base {
   :root {
+    --background: 0 0% 100%;
+    --foreground: 252 25% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 252 25% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 252 25% 12%;
+    --primary: 251 70% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 225 85% 48%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 252 20% 95%;
+    --muted-foreground: 252 10% 40%;
+    --accent: 225 85% 48%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 252 20% 88%;
+    --input: 252 20% 88%;
+    --ring: 251 70% 50%;
+    --chart-1: 251 70% 50%;
+    --chart-2: 225 85% 48%;
+    --chart-3: 280 70% 45%;
+    --chart-4: 200 85% 40%;
+    --chart-5: 160 70% 35%;
+    --radius: 0.75rem;
+    --sidebar-background: 252 20% 97%;
+    --sidebar-foreground: 252 15% 25%;
+    --sidebar-primary: 251 70% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 252 20% 92%;
+    --sidebar-accent-foreground: 251 70% 50%;
+    --sidebar-border: 252 20% 88%;
+    --sidebar-ring: 251 70% 50%;
+  }
+
+  .dark {
     --background: 252 18% 5%;
     --foreground: 0 0% 98%;
     --card: 252 18% 7%;
@@ -42,8 +78,9 @@
 }
 
 @layer base {
-  * {
+ * {
     @apply border-border;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
   body {
   @apply bg-background text-foreground;
