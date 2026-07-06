@@ -14,6 +14,7 @@ import {
   Lock,
   LogOut
 } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const NAV_ITEMS = [
   { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
@@ -81,6 +82,7 @@ export function DashboardHeader({
         </div>
       </div>
       <div className="flex items-center gap-4">
+        <ThemeToggle />
         {/* Profile Picture or Fallback Initials */}
         {user?.image ? (
           <Image 

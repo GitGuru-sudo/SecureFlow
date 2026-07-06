@@ -1,16 +1,18 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Shield, Lock, Github, ArrowRight, CheckCircle, Search, Cpu } from 'lucide-react';
+import { Shield, Lock, Github, ArrowRight, CheckCircle, Search, Cpu, ChevronDown, GitPullRequest, ScanSearch, GitMerge } from 'lucide-react';
 import Image from 'next/image';
 import { LoginButton } from '@/components/ui/login-button';
+import { ThemeToggle } from '@/components/theme-toggle';
 
+export const dynamic = 'force-dynamic';
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* Navigation */}
-      <nav className="border-b border-white/5 px-6 py-4 flex items-center justify-between glass-card sticky top-0 z-50">
-        <div className="flex items-center gap-2">
+      <nav className="border-b border-white/5 px-4 sm:px-6 py-4 flex items-center justify-between glass-card sticky top-0 z-50">
+       <div className="flex items-center gap-2 flex-shrink-0">
           <div className="w-8 h-8 rounded-lg flex items-center justify-center glow-primary">
             <Image 
               src="/logo.jpeg" 
@@ -22,7 +24,11 @@ export default function LandingPage() {
           </div>
           <span className="font-headline font-bold text-xl tracking-tight">SecureFlow</span>
         </div>
-        <div className="flex items-center gap-4">
+
+        <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+          </div>
           <LoginButton />
           <Link href={process.env.GITHUB_APP_URL!}>
             <Button className="bg-primary text-background hover:bg-primary/90 glow-primary">
@@ -34,7 +40,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-10 pb-32 px-6 overflow-hidden">
+      <section className="relative pt-12 md:pt-16 pb-20 md:pb-32 px-4 sm:px-6 overflow-hidden">
         {/* Background Gradients */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[600px] bg-[radial-gradient(circle_at_center,rgba(146,123,255,0.08)_0%,transparent_70%)] pointer-events-none" />
         
@@ -43,30 +49,36 @@ export default function LandingPage() {
             <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
             V1.0 MVP NOW AVAILABLE
           </div>
-          <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-[1.1]">
+          <h1 className="font-headline text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 md:mb-8 leading-tight">
             Automated <span className="text-gradient">Security Gatekeeper</span><br />
             for Modern CI/CD
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto mb-8 md:mb-10 leading-relaxed px-2">
             SecureFlow scans every Pull Request for secrets, vulnerabilities, and risky code patterns before they ever reach your production branch.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/dashboard">
-              <Button size="lg" className="h-14 px-8 text-lg bg-primary text-background hover:bg-primary/90 glow-primary font-semibold">
-                Get Started for Free
-                <ArrowRight className="ml-2 w-5 h-5" />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-4 w-full sm:w-auto">
+            <Link href="https://github.com/GauravKarakoti/SecureFlow/tree/main/docs" target="_blank" rel="noopener noreferrer">
+              <Button
+               size="lg"
+               className="h-14 px-8 text-lg bg-primary text-background hover:bg-primary/90 hover:scale-105 transition-all duration-300 glow-primary font-semibold"
+>              Get Started for Free
+               <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
             <Link href="https://github.com/GauravKarakoti/SecureFlow/tree/main/docs" target="_blank" rel="noopener noreferrer">
-              <Button size="lg" variant="ghost" className="h-14 px-8 text-lg border border-transparent hover:border-white/10">
-                View Documentation
+              <Button
+               size="lg"
+               variant="ghost"
+               className="h-14 px-8 text-lg border border-transparent hover:border-primary/30 hover:bg-primary/5 hover:scale-105 transition-all duration-300"
+>              View Documentation
+
               </Button>
             </Link>
           </div>
         </div>
 
         {/* Hero Image Mockup */}
-        <div className="max-w-5xl mx-auto mt-20 relative px-4">
+        <div className="max-w-5xl mx-auto mt-12 md:mt-20 relative px-2 sm:px-4">
           <div className="relative rounded-2xl border border-white/10 overflow-hidden glass-card shadow-2xl">
             <div className="flex items-center gap-1.5 px-4 py-3 bg-white/5 border-b border-white/10">
               <div className="w-3 h-3 rounded-full bg-red-500/50" />
@@ -111,6 +123,15 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
+          <div className="flex justify-center mt-10 animate-bounce">
+          <a
+            href="#features"
+            className="text-muted-foreground hover:text-primary transition-colors"
+          >
+            <ChevronDown className="w-8 h-8" />
+          </a>
+         </div>
+      
       </section>
 
       {/* Features Grid */}
@@ -123,7 +144,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             <FeatureCard 
               icon={<Search className="text-primary w-6 h-6" />}
-              title="ArmorIQ Scanner"
+              title="Scanner"
               description="Deep-context scanning for API keys, AWS credentials, and thousands of known vulnerability signatures."
             />
             <FeatureCard 
@@ -133,12 +154,59 @@ export default function LandingPage() {
             />
             <FeatureCard 
               icon={<Shield className="text-primary w-6 h-6" />}
-              title="ArmorIQ Policies"
+              title="Policies"
               description="Define custom merge gates based on severity and finding type. Automate security decisions at scale."
             />
           </div>
         </div>
       </section>
+
+      <section className="py-20 px-6">
+  <div className="max-w-6xl mx-auto">
+    <div className="text-center mb-16">
+      <h2 className="font-headline text-3xl md:text-5xl font-bold mb-4">
+        How SecureFlow Works
+      </h2>
+      <p className="text-muted-foreground text-lg">
+        Secure every pull request in three simple steps.
+      </p>
+    </div>
+
+    <div className="grid md:grid-cols-3 gap-8">
+
+      <div className="glass-card p-8 rounded-2xl border border-white/5 hover:border-primary/20 transition-all duration-300 hover:-translate-y-2">
+        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+          <GitPullRequest className="w-7 h-7 text-primary" />
+        </div>
+        <h3 className="text-xl font-bold mb-3">1. Open a Pull Request</h3>
+        <p className="text-muted-foreground">
+          Developers create a pull request as part of their normal workflow.
+        </p>
+      </div>
+
+      <div className="glass-card p-8 rounded-2xl border border-white/5 hover:border-primary/20 transition-all duration-300 hover:-translate-y-2">
+        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+          <ScanSearch className="w-7 h-7 text-primary" />
+        </div>
+        <h3 className="text-xl font-bold mb-3">2. Automated Security Scan</h3>
+        <p className="text-muted-foreground">
+          SecureFlow detects secrets, vulnerabilities, and risky code before merging.
+        </p>
+      </div>
+
+      <div className="glass-card p-8 rounded-2xl border border-white/5 hover:border-primary/20 transition-all duration-300 hover:-translate-y-2">
+        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+          <GitMerge className="w-7 h-7 text-primary" />
+        </div>
+        <h3 className="text-xl font-bold mb-3">3. Merge with Confidence</h3>
+        <p className="text-muted-foreground">
+          Only secure pull requests move forward, helping teams ship safely.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
 
       {/* Footer */}
       <footer className="mt-auto border-t border-white/5 px-6 py-12 bg-background">
@@ -170,12 +238,16 @@ export default function LandingPage() {
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
   return (
-    <div className="p-8 rounded-2xl glass-card border border-white/5 hover:border-primary/20 transition-all group">
+    <div className="p-8 rounded-2xl glass-card border border-white/5 hover:border-primary/20 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/20 hover:scale-[1.02] transition-all duration-300 group">
       <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-6 group-hover:bg-primary/10 transition-colors">
         {icon}
       </div>
+
       <h3 className="font-headline text-xl font-bold mb-3">{title}</h3>
-      <p className="text-muted-foreground leading-relaxed">{description}</p>
+
+      <p className="text-muted-foreground leading-relaxed">
+        {description}
+      </p>
     </div>
   );
 }
