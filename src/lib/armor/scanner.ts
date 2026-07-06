@@ -60,17 +60,16 @@ export function extractAddedLines(patch: string): string {
   
   const processedLines: string[] = [];
   for (const line of patch.split('\n')) {
-    // Explicitly skip git patch headers and metadata
     if (line.startsWith('+++') || line.startsWith('---') || line.startsWith('@@')) {
       continue; 
     } 
-    // Tag newly added code
+    // Tag newly added code AND strip the '+' sign
     else if (line.startsWith('+')) {
-      processedLines.push(`[ADDED] ${line}`);
+      processedLines.push(`[ADDED] ${line.substring(1)}`);
     } 
-    // Preserve surrounding context (lines starting with a space)
+    // Preserve surrounding context AND strip the leading space
     else if (line.startsWith(' ')) {
-      processedLines.push(line);
+      processedLines.push(line.substring(1));
     }
   }
   return processedLines.join('\n');
