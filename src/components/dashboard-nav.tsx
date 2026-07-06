@@ -17,22 +17,21 @@ import {
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
+// Themed Navigation Items
 const NAV_ITEMS = [
-  { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Findings", href: "/dashboard/findings", icon: ShieldAlert },
-  { name: "Policies", href: "/dashboard/policies", icon: Lock },
-  { name: "Audit Logs", href: "/dashboard/audit", icon: History },
+  { name: "Mission Control", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Breach Attempts", href: "/dashboard/findings", icon: ShieldAlert },
+  { name: "Defense Strategy", href: "/dashboard/policies", icon: Lock },
+  { name: "Vault Logs", href: "/dashboard/audit", icon: History },
 ];
 
-// ─── Sidebar Content (shared between desktop sidebar & mobile drawer) ─────────
 function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
   const pathname = usePathname();
 
   return (
     <>
-      {/* Logo */}
       <div className="flex items-center gap-2 px-6 pt-6 pb-4">
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center glow-primary">
+        <div className="w-8 h-8 rounded-sm flex items-center justify-center bg-primary glow-primary">
           <Image
             src="/logo.jpeg"
             alt="SecureFlow Logo"
@@ -41,15 +40,14 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
             className="object-contain"
           />
         </div>
-        <span className="font-headline font-bold text-lg tracking-tight">
+        <span className="font-headline font-bold text-lg tracking-widest uppercase">
           SecureFlow
         </span>
       </div>
 
-      {/* Nav Items */}
       <nav className="flex flex-col gap-1 px-3">
-        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-3 mb-2">
-          Main Menu
+        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-3 mb-2 font-mono">
+          System Access
         </p>
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
@@ -60,10 +58,10 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
               href={item.href}
               onClick={onNavClick}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all",
+                "flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-bold uppercase tracking-wide transition-all",
                 isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-white/5 hover:text-white"
+                  ? "bg-primary/10 text-primary border-l-2 border-primary"
+                  : "text-muted-foreground hover:bg-white/5 hover:text-white border-l-2 border-transparent"
               )}
             >
               <Icon className="w-4 h-4 shrink-0" />

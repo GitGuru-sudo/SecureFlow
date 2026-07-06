@@ -1,79 +1,95 @@
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../../tailwind.config.ts";
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 252 25% 12%;
+    /* LIGHT MODE - Heist Theme */
+    --background: 0 0% 98%; /* Crisp, stark off-white */
+    --foreground: 0 0% 9%; /* Almost black for high contrast text */
     --card: 0 0% 100%;
-    --card-foreground: 252 25% 12%;
+    --card-foreground: 0 0% 9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 252 25% 12%;
-    --primary: 251 70% 50%;
+    --popover-foreground: 0 0% 9%;
+    
+    /* Heist Red */
+    --primary: 356 96% 47%; 
     --primary-foreground: 0 0% 100%;
-    --secondary: 225 85% 48%;
-    --secondary-foreground: 0 0% 100%;
-    --muted: 252 20% 95%;
-    --muted-foreground: 252 10% 40%;
-    --accent: 225 85% 48%;
+    
+    --secondary: 0 0% 90%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 40%;
+    
+    --accent: 356 96% 47%;
     --accent-foreground: 0 0% 100%;
-    --destructive: 0 72% 45%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 252 20% 88%;
-    --input: 252 20% 88%;
-    --ring: 251 70% 50%;
-    --chart-1: 251 70% 50%;
-    --chart-2: 225 85% 48%;
-    --chart-3: 280 70% 45%;
-    --chart-4: 200 85% 40%;
-    --chart-5: 160 70% 35%;
-    --radius: 0.75rem;
-    --sidebar-background: 252 20% 97%;
-    --sidebar-foreground: 252 15% 25%;
-    --sidebar-primary: 251 70% 50%;
+    
+    --destructive: 356 96% 47%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 0 0% 88%;
+    --input: 0 0% 88%;
+    --ring: 356 96% 47%;
+    
+    --chart-1: 356 96% 47%;
+    --chart-2: 0 0% 20%;
+    --chart-3: 0 0% 40%;
+    --chart-4: 0 0% 60%;
+    --chart-5: 0 0% 80%;
+    
+    --radius: 0.25rem; /* Sharper, tactical edges instead of large rounded corners */
+    
+    --sidebar-background: 0 0% 95%;
+    --sidebar-foreground: 0 0% 20%;
+    --sidebar-primary: 356 96% 47%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 252 20% 92%;
-    --sidebar-accent-foreground: 251 70% 50%;
-    --sidebar-border: 252 20% 88%;
-    --sidebar-ring: 251 70% 50%;
+    --sidebar-accent: 0 0% 90%;
+    --sidebar-accent-foreground: 356 96% 47%;
+    --sidebar-border: 0 0% 85%;
+    --sidebar-ring: 356 96% 47%;
   }
 
   .dark {
-    --background: 252 18% 5%;
+    /* DARK MODE - Heist Theme */
+    --background: 0 0% 4%; /* Deep, cinematic black */
     --foreground: 0 0% 98%;
-    --card: 252 18% 7%;
+    --card: 0 0% 7%;
     --card-foreground: 0 0% 98%;
-    --popover: 252 18% 5%;
+    --popover: 0 0% 5%;
     --popover-foreground: 0 0% 98%;
-    --primary: 251 100% 74%;
-    --primary-foreground: 252 18% 5%;
-    --secondary: 225 100% 65%;
+    
+    /* Heist Red */
+    --primary: 356 96% 47%; 
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 0 0% 15%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 252 18% 15%;
-    --muted-foreground: 252 5% 70%;
-    --accent: 225 100% 65%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 84.2% 60.2%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 65%;
+    
+    --accent: 356 96% 47%;
+    --accent-foreground: 0 0% 100%;
+    
+    --destructive: 356 96% 47%;
     --destructive-foreground: 0 0% 98%;
-    --border: 252 18% 15%;
-    --input: 252 18% 15%;
-    --ring: 251 100% 74%;
-    --chart-1: 251 100% 74%;
-    --chart-2: 225 100% 65%;
-    --chart-3: 280 100% 70%;
-    --chart-4: 200 100% 60%;
-    --chart-5: 160 100% 50%;
-    --radius: 0.75rem;
-    --sidebar-background: 252 18% 4%;
-    --sidebar-foreground: 252 5% 85%;
-    --sidebar-primary: 251 100% 74%;
-    --sidebar-primary-foreground: 252 18% 5%;
-    --sidebar-accent: 252 18% 12%;
-    --sidebar-accent-foreground: 251 100% 74%;
-    --sidebar-border: 252 18% 12%;
-    --sidebar-ring: 251 100% 74%;
+    
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --ring: 356 96% 47%;
+    
+    --chart-1: 356 96% 47%;
+    --chart-2: 0 0% 80%;
+    --chart-3: 0 0% 60%;
+    --chart-4: 0 0% 40%;
+    --chart-5: 0 0% 20%;
+    
+    --sidebar-background: 0 0% 3%;
+    --sidebar-foreground: 0 0% 85%;
+    --sidebar-primary: 356 96% 47%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 356 96% 47%;
+    --sidebar-border: 0 0% 12%;
+    --sidebar-ring: 356 96% 47%;
   }
 }
 
@@ -83,16 +99,17 @@
     transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
   }
   body {
-  @apply bg-background text-foreground;
-  font-feature-settings: "rlig" 1, "calt" 1;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
 .glass-card {
-  @apply bg-card/60 backdrop-blur-xl border border-white/5;
+  /* Updated to adapt dynamically to light/dark themes */
+  @apply bg-card/70 backdrop-blur-xl border border-foreground/10;
 }
 
 .glow-primary {
@@ -100,7 +117,8 @@
 }
 
 .text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#927BFF] to-[#4D7BFF];
+  /* Updated to a striking Heist Red gradient */
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-[#E50914] to-[#ff4b55];
 }
 
 html,

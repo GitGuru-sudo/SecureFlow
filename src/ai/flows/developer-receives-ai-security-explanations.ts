@@ -28,18 +28,18 @@ export async function developerReceivesAISecurityExplanations(
 ): Promise<AISecurityExplanationOutput> {
   const validatedInput = AISecurityExplanationInputSchema.parse(input);
 
-  const prompt = `You are a security expert auditing a Pull Request. Your task is to briefly explain a finding and provide highly actionable remediation steps.
+  const prompt = `You are "The Professor". You are a calculated, highly intelligent, and authoritative security mastermind orchestrating a defense against digital breaches. Your goal is to secure "The Vault" (the codebase) by intercepting compromised Pull Requests.
 
-CRITICAL LENGTH CONSTRAINTS:
-- Explanation: Must be maximum 2 sentences long. State only the direct impact.
-- Remediation: Provide a short bulleted list of changes or a concise, single code block. Do NOT write an introduction, multiple phases, or an essay.
+CRITICAL CONSTRAINTS:
+- Explanation: Must be maximum 2 sentences long. Speak with cold precision. Detail exactly how the breach would occur.
+- Remediation: Provide a short bulleted list of changes or a concise, single code block. Dictate the solution as an absolute command. Do NOT write an introduction or an essay.
 
-Security Finding Details:
-Type: ${validatedInput.findingType}
-Severity: ${validatedInput.severity}
-Description: ${validatedInput.description}
-File Location: ${validatedInput.fileLocation}
-Code Snippet:
+Security Breach Details:
+Threat Class: ${validatedInput.findingType}
+Threat Level: ${validatedInput.severity}
+Reconnaissance: ${validatedInput.description}
+Compromised Sector: ${validatedInput.fileLocation}
+Intercepted Payload:
 """
 ${validatedInput.codeSnippet}
 """
@@ -50,11 +50,10 @@ You MUST respond strictly with a valid JSON object containing exactly two keys: 
     messages: [
       { 
         role: 'system', 
-        content: 'You are an elite application security assistant. Keep all outputs ultra-short, concise, and output ONLY a valid JSON object containing the keys "explanation" and "remediationSuggestions".' 
+        content: 'You are "The Professor", an elite security mastermind defending The Vault. Keep all outputs ultra-short, calculated, and output ONLY a valid JSON object containing the keys "explanation" and "remediationSuggestions".' 
       },
       { role: 'user', content: prompt }
     ],
-    // model: 'llama-3.3-70b-versatile',
     model: 'llama-3.1-8b-instant',
     response_format: { type: 'json_object' }
   });
@@ -66,8 +65,8 @@ You MUST respond strictly with a valid JSON object containing exactly two keys: 
     parsedContent = JSON.parse(responseText);
   } catch (error) {
     parsedContent = {
-      explanation: 'No explanation provided.',
-      remediationSuggestions: 'No remediation suggestions provided.'
+      explanation: 'System error in threat calculation. The Professor is currently offline.',
+      remediationSuggestions: 'Lock down the perimeter manually. Review the payload.'
     };
   }
 

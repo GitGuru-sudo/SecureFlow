@@ -1,6 +1,6 @@
 import { signIn } from "@/auth";
 import { Button } from "@/components/ui/button";
-import { Github, Shield } from "lucide-react";
+import { GitBranch, Shield } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -51,7 +51,7 @@ export default async function LoginPage({
             size="lg" 
             className="w-full bg-primary text-background hover:bg-primary/90 glow-primary font-semibold h-12 text-md"
           >
-            <Github className="w-5 h-5 mr-2" />
+            <GitBranch className="w-5 h-5 mr-2" />
             Continue with GitHub
           </Button>
         </form>
