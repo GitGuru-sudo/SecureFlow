@@ -56,7 +56,7 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
           return (
             <Link
               key={item.href}
-              href={item.href}
+              href={item.href || "#"}
               onClick={onNavClick}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-bold uppercase tracking-wide transition-all",
