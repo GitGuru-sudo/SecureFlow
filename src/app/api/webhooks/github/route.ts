@@ -8,6 +8,7 @@ import { developerReceivesAISecurityExplanations } from '@/ai/flows/developer-re
 import { App, Octokit } from 'octokit';
 import { throttling } from '@octokit/plugin-throttling';
 import prisma from '@/lib/prisma';
+import { withErrorHandler } from '@/lib/middleware/error-handler';
 
 
 
@@ -50,13 +51,11 @@ async function verifyGitHubWebhook(req: NextRequest): Promise<any> {
   return JSON.parse(payloadText);
 }
 
-export async function POST(req: NextRequest) {
+export const POST = withErrorHandler(async function POST(req: NextRequest) {
   let octokitInstance: any = null;
   let checkRunId: number | null = null;
   let repoOwner: string = '';
   let repoName: string = '';
-
-  try {
     const rawPayload = await verifyGitHubWebhook(req);
 
     const deliveryId = req.headers.get('x-github-delivery');
@@ -543,29 +542,4 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ message: 'Event successfully caught but ignored' }, { status: 200 });
-
-  } catch (error: any) {
-    console.error('Webhook Error:', error);
-
-    if (octokitInstance && checkRunId && repoOwner && repoName) {
-      try {
-        await octokitInstance.rest.checks.update({
-          owner: repoOwner,
-          repo: repoName,
-          check_run_id: checkRunId,
-          status: 'completed',
-          conclusion: 'failure',
-          completed_at: new Date().toISOString(),
-          output: {
-            title: 'Scan Failed: Webhook Exception',
-            summary: `SecureFlow encountered an unexpected error during execution. Error details: ${error.message || String(error)}`,
-          }
-        });
-      } catch (checkUpdateError) {
-        console.error('Failed to update GitHub check run on exception:', checkUpdateError);
-      }
-    }
-
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-  }
-}
+});
