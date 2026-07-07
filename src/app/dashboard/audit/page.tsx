@@ -1,3 +1,4 @@
+import React from 'react';
 import { 
   Table, 
   TableBody, 
@@ -102,35 +103,61 @@ export default async function AuditPage() {
                 // FIX: Retrieve user name from Map instead of rendering ID
                 const displayUser = log.userId ? (userMap.get(log.userId) || log.userId) : "System";
                 return (
-                  <TableRow key={log.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                    <TableCell className="py-4">
-                      <span className="font-bold text-sm">{log.action}</span>
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium">{displayUser}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <span className="text-xs text-muted-foreground font-mono">{log.resource}</span>
-                    </TableCell>
-                    <TableCell className="py-4">
-                      <Badge variant={
-                        log.decision === 'BLOCK' ? 'destructive' : 
-                        log.decision === 'SUCCESS' ? 'default' : 'secondary'
-                      } className="text-[10px] tracking-widest px-1.5">
-                        {log.decision || 'INFO'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="py-4 text-right">
-                      <span className="text-[10px] text-muted-foreground font-mono">
-                        {new Intl.DateTimeFormat('en-US', { 
-                          dateStyle: 'medium', 
-                          timeStyle: 'short' 
-                        }).format(new Date(log.timestamp))}
-                      </span>
-                    </TableCell>
-                  </TableRow>
+                  <React.Fragment key={log.id}>
+                    <TableRow className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                      <TableCell className="py-4">
+                        <span className="font-bold text-sm">{log.action}</span>
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-medium">{displayUser}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <span className="text-xs text-muted-foreground font-mono">{log.resource}</span>
+                      </TableCell>
+                      <TableCell className="py-4">
+                        <Badge variant={
+                          log.decision === 'BLOCK' ? 'destructive' : 
+                          log.decision === 'SUCCESS' ? 'default' : 'secondary'
+                        } className="text-[10px] tracking-widest px-1.5">
+                          {log.decision || 'INFO'}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-4 text-right">
+                        <span className="text-[10px] text-muted-foreground font-mono">
+                          {new Intl.DateTimeFormat('en-US', { 
+                            dateStyle: 'medium', 
+                            timeStyle: 'short' 
+                          }).format(new Date(log.timestamp))}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                    {log.decision === 'SUCCESS' && (
+                      <TableRow>
+                        <TableCell colSpan={5}>
+                          <div className="mt-8 flex flex-col items-center p-6 border border-red-500/20 bg-red-500/5 rounded-lg">
+                            <h3 className="text-xl font-bold text-red-500 mb-4">Transmission Ready</h3>
+                            {/* Image Preview for the user */}
+                            <img 
+                              src={`/api/og/heist?project=${encodeURIComponent(log.resource || 'The Royal Mint')}`} 
+                              alt="Heist Success Card" 
+                              className="w-full max-w-2xl rounded-md border border-red-900/50 shadow-2xl mb-6"
+                            />
+                            {/* The Share Button */}
+                            <a 
+                              href={`https://twitter.com/intent/tweet?text=The%20vault%20is%20empty.%20Zero%20traces%20left%20behind.%20%F0%9F%8E%AD%0A%0AAudit%20passed%20via%20SecureFlow`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded shadow-lg transition-all"
+                            >
+                              Broadcast to the Resistance 📢
+                            </a>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </React.Fragment>
                 );
               })}
             </TableBody>
