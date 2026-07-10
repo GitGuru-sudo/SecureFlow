@@ -37,9 +37,9 @@ vi.mock('groq-sdk', () => {
 vi.mock('dotenv/config', () => ({}));
 
 import {
-  developerReceivesAISecurityExplanations,
-  __internal,
+  developerReceivesAISecurityExplanations
 } from '../developer-receives-ai-security-explanations';
+import { __internal } from '../security-helpers';
 
 const { detectPromptInjection, contradictsSeverity, buildPrompt } = __internal;
 
