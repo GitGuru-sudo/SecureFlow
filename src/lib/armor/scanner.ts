@@ -58,6 +58,24 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || 'dummy-key-for-build',
 });
 
+// --- Timeout / deadline guards -------------------------------------------------------------
+// A single malformed or maliciously-crafted diff (e.g. one engineered to make the LLM hang,
+// or a PR large enough to spawn many batches) must never be able to hang the scan indefinitely
+// or exhaust memory. These bound worst-case behavior explicitly rather than relying on the
+// HTTP client's own defaults (Groq's SDK default is 1 minute per request, with no cap at all
+// on the number of batches a large PR can produce).
+const SCAN_REQUEST_TIMEOUT_MS = 20_000; // hard cap per individual LLM call
+const MAX_TOTAL_SCAN_MS = 120_000; // hard cap across the whole scanPullRequest() call
+const MAX_RETRY_WAIT_MS = 15_000; // cap on any single rate-limit backoff wait
+
+// --- Recursive sanitization guards ---------------------------------------------------------
+// A single pass of `<`/`>` escaping can be defeated by nesting or stacking encodings (e.g.
+// HTML-entity-encoded entities, unicode escape sequences, zero-width characters used to split
+// up flagged keywords). sanitizeRecursively() normalizes until stable or these caps are hit,
+// so the normalization loop itself can't become a new hang/memory vector.
+const MAX_SANITIZE_ITERATIONS = 5;
+const MAX_SANITIZED_LENGTH = 100_000;
+
 // Non-executable text, assets, metadata or dependency configurations that shouldn't be audited
 const IGNORED_EXTENSIONS = [
   'lock.json', '.lock', 'lock.yaml', '.csv',
@@ -134,6 +152,36 @@ function shouldIgnore(filename: string, customIgnores: RegExp[] = []): boolean {
   }
 
   return false;
+}
+
+function decodeOneLayer(input: string): string {
+  let out = decode(input);
+
+  out = out.replace(/[\u200B\u200C\u200D\uFEFF\u00AD\u2060\u180E]/g, "");
+
+  out = out.normalize("NFKC");
+
+  return out;
+}
+
+function sanitizeRecursively(input: string): string {
+  let current = input;
+
+  for (let i = 0; i < MAX_SANITIZE_ITERATIONS; i++) {
+    const next = decodeOneLayer(current);
+
+    if (next.length > MAX_SANITIZED_LENGTH) {
+      return next.slice(0, MAX_SANITIZED_LENGTH);
+    }
+
+    if (next === current) {
+      break;
+    }
+
+    current = next;
+  }
+
+  return current;
 }
 
 /**
@@ -228,6 +276,9 @@ function filterFalsePositives(findings: ScanFinding[]): ScanFinding[] {
 
 export class ArmorIQScanner {
   async scanPullRequest(files: FileChange[], activePolicies: any[] = [], customIgnores: string[] = []): Promise<ScanFinding[]> {
+    const scanStartedAt = Date.now();
+    const deadlineExceeded = () => Date.now() - scanStartedAt > MAX_TOTAL_SCAN_MS;
+
     let currentBatch = '';
     let currentBatchFiles: string[] = [];
     const allFindings: ScanFinding[] = [];
@@ -247,7 +298,17 @@ export class ArmorIQScanner {
       policyInstructions += `\n\nCRITICAL: DO NOT focus on or flag general vulnerabilities like SQL injection, XSS, or logic flaws. ONLY FOCUS ON THE DEFAULT SECRET-RELATED ISSUES ABOVE.`;
     }
 
+    let deadlineHit = false;
+
     for (const file of files) {
+      if (deadlineExceeded()) {
+        deadlineHit = true;
+        console.warn(
+          `⏱️ Scan deadline (${MAX_TOTAL_SCAN_MS / 1000}s) exceeded — skipping remaining files starting at ${file.filename}. Returning partial findings.`
+        );
+        break;
+      }
+
       if (shouldIgnore(file.filename, compiledCustomIgnores)) {
         console.log(`🛡️ Skipping ignored file: ${file.filename}`);
         continue;
@@ -287,9 +348,7 @@ export class ArmorIQScanner {
 
       const maxContentSize = MAX_COMBINED_LENGTH - wrapperOverhead;
 
-      const sanitizedLines = addedLines
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+      const sanitizedLines = sanitizeRecursively(addedLines);
 
       const chunks =
         sanitizedLines.length > maxContentSize
@@ -392,9 +451,9 @@ CRITICAL RULES:
               },
               { role: 'user', content: prompt }
             ],
-            model: 'llama-3.1-8b-instant',
+            model: process.env.GROQ_MODEL || 'openai/gpt-oss-20b',
             response_format: { type: 'json_object' },
-          });
+          }, { timeout: SCAN_REQUEST_TIMEOUT_MS });
 
           const responseText = chatCompletion.choices[0]?.message?.content || '{"findings": []}';
           const result = JSON.parse(responseText);
@@ -436,14 +495,28 @@ CRITICAL RULES:
           lastError = error;
           if (error.status === 429) {
             const retryAfterHeader = error.headers?.get?.('retry-after') || error.headers?.['retry-after'];
-            const waitTime = retryAfterHeader ? parseInt(retryAfterHeader, 10) * 1000 : (4 - retries) * 25000;
-            
+            const requestedWait = retryAfterHeader ? parseInt(retryAfterHeader, 10) * 1000 : (4 - retries) * 25000;
+            const remainingBudget = MAX_TOTAL_SCAN_MS - (Date.now() - scanStartedAt);
+            const waitTime = Math.max(0, Math.min(requestedWait, MAX_RETRY_WAIT_MS, remainingBudget));
+
+            if (waitTime <= 0) {
+              console.warn(`⏱️ Scan deadline exceeded during rate-limit backoff — aborting retries for this batch.`);
+              break;
+            }
+
             console.warn(`⏳ Rate limit reached. Waiting ${waitTime / 1000} seconds...`);
             await delay(waitTime);
             retries--;
           } else if (error.status === 400 && error.error?.code === 'json_validate_failed') {
             console.warn(`⚠️ LLM generated invalid JSON. Retrying... (${retries} attempts left)`);
             retries--;
+          } else if (error instanceof Groq.APIConnectionTimeoutError || error?.name === 'APIConnectionTimeoutError') {
+            console.warn(`⏱️ LLM request exceeded ${SCAN_REQUEST_TIMEOUT_MS / 1000}s timeout. Retrying... (${retries} attempts left)`);
+            retries--;
+            if (deadlineExceeded()) {
+              console.warn(`⏱️ Scan deadline exceeded after a request timeout — aborting retries for this batch.`);
+              break;
+            }
           } else {
             console.error(`❌ Consolidated scan failed completely:`, error);
             break;
@@ -458,9 +531,18 @@ CRITICAL RULES:
       return findings;
     }
 
-    if (currentBatch.length > 0) {
+    if (currentBatch.length > 0 && !deadlineExceeded()) {
       const batchFindings = await processBatch(currentBatch, currentBatchFiles);
       allFindings.push(...batchFindings);
+    } else if (currentBatch.length > 0) {
+      deadlineHit = true;
+      console.warn(`⏱️ Scan deadline exceeded before the final batch (${currentBatchFiles.join(', ')}) could run — dropped from results.`);
+    }
+
+    if (deadlineHit) {
+      console.warn(
+        `⚠️ scanPullRequest() returned partial results: ${allFindings.length} finding(s) from a scan that hit its ${MAX_TOTAL_SCAN_MS / 1000}s deadline.`
+      );
     }
 
     return allFindings;
