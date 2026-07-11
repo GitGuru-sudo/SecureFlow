@@ -156,6 +156,7 @@ model Finding {
   codeSnippet  String?
   explanation  String?
   remediation  String?
+  promptInjectionSuspected Boolean @default(false)
   createdAt    DateTime   @default(now())
 
   @@index([scanResultId])

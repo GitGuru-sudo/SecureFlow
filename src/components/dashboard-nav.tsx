@@ -1,199 +1,203 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { signOut } from "next-auth/react";
-import { cn } from "@/lib/utils";
-import { useEffect } from "react";
-import {
-  LayoutDashboard,
-  ShieldAlert,
-  History,
-  Lock,
-  LogOut,
-  Menu,
-  X,
-  VenetianMask,
-  Trophy,
-} from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
+  import Link from "next/link";
+  import Image from "next/image";
+  import { usePathname } from "next/navigation";
+  import { signOut } from "next-auth/react";
+  import { cn } from "@/lib/utils";
+  import { useEffect } from "react";
+  import {
+    LayoutDashboard,
+    ShieldAlert,
+    History,
+    Lock,
+    LogOut,
+    Menu,
+    X,
+    VenetianMask,
+    Trophy,
+  } from "lucide-react";
+  import { ThemeToggle } from "@/components/theme-toggle";
+  import { CyberTextReveal } from "@/components/cyber-text-reveal";
+  import { CyberAvatarReveal } from "@/components/cyber-avatar-reveal";
 
-// Themed Navigation Items
-const NAV_ITEMS = [
-  { name: "Mission Control", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Breach Attempts", href: "/dashboard/findings", icon: ShieldAlert },
-  { name: "Defense Strategy", href: "/dashboard/policies", icon: Lock },
-  { name: "Vault Logs", href: "/dashboard/audit", icon: History },
-  { name: "Most Wanted", href: "/leaderboard", icon: Trophy },
-];
+  // Themed Navigation Items
+  const NAV_ITEMS = [
+    { name: "Mission Control", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Breach Attempts", href: "/dashboard/findings", icon: ShieldAlert },
+    { name: "Defense Strategy", href: "/dashboard/policies", icon: Lock },
+    { name: "Vault Logs", href: "/dashboard/audit", icon: History },
+    { name: "Most Wanted", href: "/leaderboard", icon: Trophy },
+  ];
 
-function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
-  const pathname = usePathname();
 
-  return (
-    <>
-      <div className="flex items-center gap-2 px-6 pt-6 pb-4">
-        <div className="w-8 h-8 rounded-sm flex items-center justify-center bg-primary glow-primary">
-          <Image
-            src="/logo.png"
-            alt="SecureFlow Logo"
-            width={64}
-            height={64}
-            className="object-contain"
-          />
+  // ─── SidebarContent ───────────────────────────────────────────────────────────
+  function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
+    const pathname = usePathname();
+
+    return (
+      <>
+        <div className="flex items-center gap-2 px-6 pt-6 pb-4">
+          <div className="w-8 h-8 rounded-sm flex items-center justify-center bg-primary glow-primary">
+            <Image
+              src="/logo.png"
+              alt="SecureFlow Logo"
+              width={64}
+              height={64}
+              className="object-contain"
+            />
+          </div>
+          <span className="font-headline font-bold text-lg tracking-widest uppercase">
+            SecureFlow
+          </span>
         </div>
-        <span className="font-headline font-bold text-lg tracking-widest uppercase">
-          SecureFlow
-        </span>
-      </div>
 
-      <nav className="flex flex-col gap-1 px-3">
-        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-3 mb-2 font-mono">
-          System Access
-        </p>
-        {NAV_ITEMS.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href || "#"}
-              onClick={onNavClick}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-bold uppercase tracking-wide transition-all",
-                isActive
-                  ? "bg-primary/10 text-primary border-l-2 border-primary"
-                  : "text-muted-foreground hover:bg-white/5 hover:text-white border-l-2 border-transparent"
-              )}
+        <nav className="flex flex-col gap-1 px-3">
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-3 mb-2 font-mono">
+            System Access
+          </p>
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href || "#"}
+                onClick={onNavClick}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-sm text-sm font-bold uppercase tracking-wide
+  transition-all",
+                  isActive
+                    ? "bg-primary/10 text-primary border-l-2 border-primary"
+                    : "text-muted-foreground hover:bg-white/5 hover:text-white border-l-2 border-transparent"
+                )}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                {item.name}
+              </Link>
+            );
+          })}
+        </nav>
+      </>
+    );
+  }
+
+  // ─── Desktop Sidebar ──────────────────────────────────────────────────────────
+  export function DashboardSidebar() {
+    return (
+      <aside className="hidden lg:flex w-64 border-r border-white/5 bg-sidebar min-h-screen flex-col gap-8">
+        <SidebarContent />
+      </aside>
+    );
+  }
+
+  // ─── Mobile Drawer ────────────────────────────────────────────────────────────
+  export function MobileDrawer({
+    open,
+    onClose,
+  }: {
+    open: boolean;
+    onClose: () => void;
+  }) {
+    useEffect(() => {
+      document.body.style.overflow = open ? "hidden" : "";
+      return () => {
+        document.body.style.overflow = "";
+      };
+    }, [open]);
+
+    return (
+      <>
+        {/* Backdrop */}
+        <div
+          className={cn(
+            "fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden",
+            open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          )}
+          onClick={onClose}
+          aria-hidden="true"
+        />
+
+        {/* Drawer Panel */}
+        <div
+          className={cn(
+            "fixed top-0 left-0 z-50 h-full w-72 bg-sidebar border-r border-white/5 flex flex-col gap-4
+  transition-transform duration-300 ease-in-out lg:hidden",
+            open ? "translate-x-0" : "-translate-x-full"
+          )}
+        >
+          <div className="flex justify-end px-4 pt-4">
+            <button
+              onClick={onClose}
+              className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-white
+  hover:bg-white/5 transition-colors"
+              aria-label="Close menu"
             >
-              <Icon className="w-4 h-4 shrink-0" />
-              {item.name}
-            </Link>
-          );
-        })}
-      </nav>
-    </>
-  );
-}
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-// ─── Desktop Sidebar ──────────────────────────────────────────────────────────
-export function DashboardSidebar() {
-  return (
-    <aside className="hidden lg:flex w-64 border-r border-white/5 bg-sidebar min-h-screen flex-col gap-8">
-      <SidebarContent />
-    </aside>
-  );
-}
+          <SidebarContent onNavClick={onClose} />
+        </div>
+      </>
+    );
+  }
 
-// ─── Mobile Drawer ────────────────────────────────────────────────────────────
-export function MobileDrawer({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) {
-  // Lock body scroll when open
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
+  // ─── Header ───────────────────────────────────────────────────────────────────
+  export function DashboardHeader({
+    user,
+    onMenuClick,
+  }: {
+    user?: {
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+      codename?: string | null;
     };
-  }, [open]);
+    onMenuClick?: () => void;
+  }) {
 
-  return (
-    <>
-      {/* Backdrop */}
-      <div
-        className={cn(
-          "fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden",
-          open ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-        )}
-        onClick={onClose}
-        aria-hidden="true"
-      />
+    return (
+      <header className="h-16 border-b border-white/5 px-4 sm:px-8 flex items-center justify-between glass-card sticky
+  top-0 z-40">
 
-      {/* Drawer Panel */}
-      <div
-        className={cn(
-          "fixed top-0 left-0 z-50 h-full w-72 bg-sidebar border-r border-white/5 flex flex-col gap-4 transition-transform duration-300 ease-in-out lg:hidden",
-          open ? "translate-x-0" : "-translate-x-full"
-        )}
-      >
-        {/* Close button */}
-        <div className="flex justify-end px-4 pt-4">
+        {/* ── Left: breadcrumb + username ───────────────────────── */}
+        <div className="flex items-center gap-3">
+          {/* Hamburger — mobile only */}
           <button
-            onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
-            aria-label="Close menu"
+            onClick={onMenuClick}
+            className="lg:hidden w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground
+  hover:text-white hover:bg-white/5 transition-colors"
+            aria-label="Open menu"
           >
-            <X className="w-5 h-5" />
+            <Menu className="w-5 h-5" />
+          </button>
+
+          <div className="text-sm text-muted-foreground flex items-center gap-1">
+            <span className="text-white font-medium">User</span>
+            <span>/</span>
+            {/* Username — scrambles into real name on hover (see CyberTextReveal) */}
+            <CyberTextReveal codename={user?.codename} realName={user?.name} />
+          </div>
+        </div>
+
+        {/* ── Right: theme toggle + avatar + logout ─────────────── */}
+        <div className="flex items-center gap-3 sm:gap-4">
+          <ThemeToggle />
+
+          {/* Avatar — glitch-dissolves between VenetianMask and GitHub avatar (see CyberAvatarReveal) */}
+          <CyberAvatarReveal image={user?.image} name={user?.name} />
+
+          {/* Logout Button */}
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-white
+  hover:bg-white/5 transition-colors"
+            title="Log out"
+          >
+            <LogOut className="w-4 h-4" />
           </button>
         </div>
-
-        <SidebarContent onNavClick={onClose} />
-      </div>
-    </>
-  );
-}
-
-// ─── Header ───────────────────────────────────────────────────────────────────
-export function DashboardHeader({
-  user,
-  onMenuClick,
-}: {
-  user?: { name?: string | null; email?: string | null; image?: string | null; codename?: string | null };
-  onMenuClick?: () => void;
-}) {
-  return (
-    <header className="h-16 border-b border-white/5 px-4 sm:px-8 flex items-center justify-between glass-card sticky top-0 z-40">
-      <div className="flex items-center gap-3">
-        {/* Hamburger — only visible on mobile */}
-        <button
-          onClick={onMenuClick}
-          className="lg:hidden w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
-          aria-label="Open menu"
-        >
-          <Menu className="w-5 h-5" />
-        </button>
-
-        <div className="text-sm text-muted-foreground">
-          <span className="text-white font-medium">User</span> /{" "}
-          {user?.codename || "Recruit"}
-        </div>
-      </div>
-
-      <div className="flex items-center gap-3 sm:gap-4">
-        <ThemeToggle />
-
-        {user?.codename ? (
-          <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0">
-            <VenetianMask className="w-5 h-5 text-red-500" />
-          </div>
-        ) : user?.image ? (
-          <Image
-            src={user.image}
-            alt={user.name || "Profile"}
-            width={32}
-            height={32}
-            className="rounded-full border border-primary/30"
-          />
-        ) : (
-          <div className="w-8 h-8 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
-            {user?.name ? user.name.slice(0, 2).toUpperCase() : "NA"}
-          </div>
-        )}
-
-        {/* Logout Button */}
-        <button
-          onClick={() => signOut({ callbackUrl: "/" })}
-          className="w-8 h-8 flex items-center justify-center rounded-full text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
-          title="Log out"
-        >
-          <LogOut className="w-4 h-4" />
-        </button>
-      </div>
-    </header>
-  );
-}
+      </header>
+    );
+  }
