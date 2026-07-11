@@ -76,8 +76,14 @@ export async function POST(req: NextRequest) {
         number: z.number(),
         title: z.string().optional(),
         state: z.string().optional(),
+        merged: z.boolean().optional(),
+        merged_at: z.string().nullable().optional(),
         head: z.object({
           sha: z.string()
+        }).passthrough().optional(),
+        user: z.object({
+          login: z.string(),
+          avatar_url: z.string().optional()
         }).passthrough().optional()
       }).passthrough().optional(),
       repository: repoSchema.optional(),
@@ -152,6 +158,42 @@ export async function POST(req: NextRequest) {
 
     if (!installation || !installation.id) {
        return NextResponse.json({ message: 'No GitHub App installation ID found' }, { status: 400 });
+    }
+
+    // Record merges so the contribution leaderboard reflects real data:
+    // one star is awarded per merged PR (state === "merged"). A merge is a
+    // `pull_request` `closed` event with `merged: true`; we only need to flip
+    // the stored state, so this skips the full scan pipeline below.
+    if (event === 'pull_request' && action === 'closed') {
+      const wasMerged = Boolean(pull_request?.merged || pull_request?.merged_at);
+      const newState = wasMerged ? 'merged' : 'closed';
+
+      const dbRepo = repository?.id
+        ? await prisma.repository.findUnique({ where: { githubId: BigInt(repository.id) } })
+        : null;
+
+      if (dbRepo && pull_request) {
+        await prisma.pullRequest.upsert({
+          where: { githubId: BigInt(pull_request.id) },
+          update: {
+            state: newState,
+            authorLogin: pull_request.user?.login ?? null,
+            authorAvatarUrl: pull_request.user?.avatar_url ?? null,
+          },
+          create: {
+            githubId: BigInt(pull_request.id),
+            prNumber: pull_request.number,
+            title: pull_request.title ?? '',
+            state: newState,
+            status: 'REVIEW REQUIRED',
+            repositoryId: dbRepo.id,
+            authorLogin: pull_request.user?.login ?? null,
+            authorAvatarUrl: pull_request.user?.avatar_url ?? null,
+          },
+        });
+      }
+
+      return NextResponse.json({ success: true, message: `PR marked ${newState}` });
     }
 
     if (event === 'installation' && action === 'created') {
@@ -534,6 +576,8 @@ export async function POST(req: NextRequest) {
             title: pull_request?.title ?? '',
             state: pull_request?.state ?? '', 
             status: decision,
+            authorLogin: pull_request?.user?.login ?? null,
+            authorAvatarUrl: pull_request?.user?.avatar_url ?? null,
           },
           create: {
             githubId: BigInt(pull_request?.id ?? 0),
@@ -541,7 +585,9 @@ export async function POST(req: NextRequest) {
             title: pull_request?.title ?? '',
             state: pull_request?.state ?? '',
             status: decision,
-            repositoryId: dbRepo.id
+            repositoryId: dbRepo.id,
+            authorLogin: pull_request?.user?.login ?? null,
+            authorAvatarUrl: pull_request?.user?.avatar_url ?? null,
           }
         });
 

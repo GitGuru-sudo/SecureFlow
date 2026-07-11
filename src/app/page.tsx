@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Shield, Lock, ArrowRight, CheckCircle, Search, Cpu, ChevronDown, GitPullRequest, ScanSearch, GitMerge, GitBranch } from 'lucide-react';
+import { Shield, Lock, ArrowRight, CheckCircle, Search, Cpu, ChevronDown, GitPullRequest, ScanSearch, GitMerge, GitBranch, Trophy } from 'lucide-react';
 import Image from 'next/image';
 import { LoginButton } from '@/components/ui/login-button';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -25,6 +25,13 @@ export default function LandingPage() {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4">
+          <Link
+            href="/leaderboard"
+            className="hidden sm:inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-muted-foreground hover:text-primary transition-colors"
+          >
+            <Trophy className="w-4 h-4" />
+            Leaderboard
+          </Link>
           <div className="flex items-center gap-4">
             <ThemeToggle />
           </div>

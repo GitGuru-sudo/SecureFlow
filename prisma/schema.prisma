@@ -115,19 +115,22 @@ model UserPolicyToggle {
 }
 
 model PullRequest {
-  id           String       @id @default(cuid())
-  githubId     BigInt       @unique // Changed from Int
-  prNumber     Int // Int is fine here since PR numbers are sequential per repo
-  title        String
-  state        String // open, closed, merged
-  status       String // PASS, REVIEW_REQUIRED, BLOCKED
-  repositoryId String
-  repository   Repository   @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
-  scans        ScanResult[]
-  webhookEvents WebhookEvent[]
-  createdAt    DateTime     @default(now())
+  id              String       @id @default(cuid())
+  githubId        BigInt       @unique // Changed from Int
+  prNumber        Int // Int is fine here since PR numbers are sequential per repo
+  title           String
+  state           String // open, closed, merged
+  status          String // PASS, REVIEW_REQUIRED, BLOCKED
+  authorLogin     String?   // GitHub login of the PR author (from webhook)
+  authorAvatarUrl String?   // GitHub avatar URL (from webhook)
+  repositoryId    String
+  repository      Repository   @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  scans           ScanResult[]
+  webhookEvents   WebhookEvent[]
+  createdAt       DateTime     @default(now())
 
   @@index([repositoryId])
+  @@index([authorLogin])
 }
 
 model ScanResult {

@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   VenetianMask,
+  Trophy,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 
@@ -24,6 +25,7 @@ const NAV_ITEMS = [
   { name: "Breach Attempts", href: "/dashboard/findings", icon: ShieldAlert },
   { name: "Defense Strategy", href: "/dashboard/policies", icon: Lock },
   { name: "Vault Logs", href: "/dashboard/audit", icon: History },
+  { name: "Most Wanted", href: "/leaderboard", icon: Trophy },
 ];
 
 function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
