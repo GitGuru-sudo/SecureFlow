@@ -38,6 +38,11 @@ export default function FindingsClient({ findings, stats }: FindingsClientProps)
                       <div className="font-bold text-sm mb-0.5">{finding.type} Detected</div>
                       <div className="text-[10px] font-mono text-muted-foreground">{finding.fileLocation}</div>
                     </div>
+                    {finding.promptInjectionSuspected && (
+                      <Badge className="bg-yellow-500 text-black" title="The scanned code may contain content crafted to influence the AI explanation. Trust the severity badge over the narrative below.">
+                        ⚠️ Verify manually
+                      </Badge>
+                    )}
                     <Badge className={finding.severity === 'CRITICAL' ? 'bg-red-500' : finding.severity === 'HIGH' ? 'bg-orange-500' : 'bg-blue-500'}>
                       {finding.severity}
                     </Badge>
@@ -46,9 +51,14 @@ export default function FindingsClient({ findings, stats }: FindingsClientProps)
                 <AccordionContent className="pb-6 pt-2">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pl-12 pr-4">
                     <div className="space-y-6">
+                      {finding.promptInjectionSuspected && (
+                        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 text-xs text-yellow-200">
+                          ⚠️ <strong>AI explanation may be unreliable for this finding — verify manually.</strong> The scanned code may contain content crafted to look like instructions. The severity badge is set by the static scanner and is not affected by this.
+                        </div>
+                      )}
                       <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 relative overflow-hidden group">
                         <h4 className="text-xs font-bold text-primary uppercase tracking-widest mb-3 flex items-center gap-2">
-                          <Cpu className="w-3 h-3" /> AI Security Explanation
+                          <Cpu className="w-3 h-3" /> Radio Comms
                         </h4>
                         <p className="text-sm leading-relaxed text-foreground/90 italic">
                           &quot;{finding.explanation || 'No explanation provided.'}&quot;
